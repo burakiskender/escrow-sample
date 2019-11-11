@@ -85,8 +85,9 @@ namespace NGDSeattle
             throw new NotImplementedException();
         }
 
-        private static readonly byte[] AssetId = Helper.HexToBytes("9b7cffdaa674beae0f930ebe6085af9093e5fe56b34a5c220ccdcf6efc336fc5"); //NEO Asset ID, littleEndian
-
+        private static readonly byte[] NeoAssetId = Helper.HexToBytes("9b7cffdaa674beae0f930ebe6085af9093e5fe56b34a5c220ccdcf6efc336fc5"); //NEO Asset ID, littleEndian
+        private const byte NeoPrecision = 8; 
+        private const ulong NeoPrecisionDivisior = 100000000;
 
         private static object CreateSale(ulong price, string description)
         {
@@ -99,7 +100,7 @@ namespace NGDSeattle
             byte[] sender = null;
             foreach (var input in inputs)
             {
-                if (input.AssetId.AsBigInteger() == AssetId.AsBigInteger())
+                if (input.AssetId.AsBigInteger() == NeoAssetId.AsBigInteger())
                     sender = sender ?? input.ScriptHash;
 
                 //Escrow address as inputs is not allowed
@@ -112,11 +113,16 @@ namespace NGDSeattle
             foreach (var output in outputs)
             {
                 if (output.ScriptHash == ExecutionEngine.ExecutingScriptHash &&
-                    output.AssetId.AsBigInteger() == AssetId.AsBigInteger())
+                    output.AssetId.AsBigInteger() == NeoAssetId.AsBigInteger())
                 {
                     value += (ulong)output.Value;
                 }
             }
+
+            if (value % NeoPrecisionDivisior != 0)
+                throw new Exception("invalid NEO amount");
+
+            value = value / NeoPrecisionDivisior;
 
             if (value < price * 2)
                 throw new Exception("seller deposit must be 2x price");

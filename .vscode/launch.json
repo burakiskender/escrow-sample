@@ -1,0 +1,38 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "createSale",
+            "type": "neo-contract",
+            "request": "launch",
+            "preLaunchTask": "build",
+            "program": "${workspaceFolder}\\contract\\bin\\Debug\\netstandard2.0\\publish\\Escrow.avm",
+            "checkpoint": "${workspaceFolder}\\checkpoints\\cp1.neo-express-checkpoint",
+            "args": ["createSale", [200, "fake sale"]],
+            "storage": [],
+            "utxo": {
+                "inputs": [
+                    {
+                        "txid": "6ec85f3f2e12bfe8afe27f0c388b4799c1e2469777c5a36b27563eef7ee2c533",
+                        "n": 0,
+                    }
+                ],
+                "outputs": [
+                    {
+                        "asset": "neo",
+                        "value": 200,
+                        "address": "f7696fae06f95959dc838e6749f6e0cc868dfdef"
+                    }
+                ]
+            },
+            "runtime": {
+                "witnesses": {
+                    "check-result": true
+                }
+            }
+        }
+    ]
+}

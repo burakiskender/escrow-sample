@@ -11,13 +11,13 @@
             "preLaunchTask": "build",
             "program": "${workspaceFolder}\\contract\\bin\\Debug\\netstandard2.0\\publish\\Escrow.avm",
             "checkpoint": "${workspaceFolder}\\checkpoints\\cp1.neo-express-checkpoint",
-            "args": ["createSale", [200, "fake sale"]],
+            "args": ["createSale", [100, "fake sale"]],
             "storage": [],
             "utxo": {
                 "inputs": [
                     {
-                        "txid": "6ec85f3f2e12bfe8afe27f0c388b4799c1e2469777c5a36b27563eef7ee2c533",
-                        "n": 0,
+                        "txid": "89e1914bab8c6f65f03911ab1375a8c12101adbf72ce12f728d8b8097807cab1",
+                        "n": 1
                     }
                 ],
                 "outputs": [

@@ -37,6 +37,41 @@
       }
     }
   ],
-  "wallets": [],
+  "wallets": [
+    {
+      "name": "seller",
+      "accounts": [
+        {
+          "private-key": "79ccf764755760a2b17c17cd7303ab339bb2fcd38af57219e962d55c10a8fb9f",
+          "script-hash": "ARZJ7NeUPLZqvStSrAXkrkWA68tPCpsM81",
+          "label": null,
+          "is-default": true,
+          "contract": {
+            "script": "21033ca11c08ff753b374065a0adc321f6c33b014e1e116430e71c8fd81ab5e17473ac",
+            "parameters": [
+              "Signature"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "buyer",
+      "accounts": [
+        {
+          "private-key": "d9e3c216f99a5e51e3a9ca0d57c07291fb0974a5b215356c6787cc974a5a373a",
+          "script-hash": "AWyd4a53bWpjNsD65wAREqymkRnypnPv7j",
+          "label": null,
+          "is-default": true,
+          "contract": {
+            "script": "2102efc8f2f3fc06fcfa113a4357615bd645640105f61f5955c22702d91b701d6297ac",
+            "parameters": [
+              "Signature"
+            ]
+          }
+        }
+      ]
+    }
+  ],
   "contracts": []
 }

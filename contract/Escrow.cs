@@ -28,7 +28,7 @@ namespace NGDSeattle
 
     public class Escrow : SmartContract
     {
-        public delegate void ErrorDelegate(string message);
+        public delegate void ErrorDelegate(string message, object[] data = null);
         public static event ErrorDelegate Error;
 
         public delegate void NewSaleDelegate(byte[] txid, byte[] seller, string description, ulong price);
@@ -123,7 +123,7 @@ namespace NGDSeattle
 
             if (value < price * 2)
             {
-                Error("seller deposit must be 2x price");
+                Error("seller deposit must be 2x price", new object[] { value, price });
                 return false;
             }
 

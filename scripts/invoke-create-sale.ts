@@ -1,10 +1,13 @@
-import Neon, { api, wallet, u } from "@cityofzion/neon-js";
+import Neon, { api, wallet, u, sc } from "@cityofzion/neon-js";
 import { getContractHash } from './get-contract-hash'
+import { rpc } from "@cityofzion/neon-core";
 
 const operation = "createSale"
 const rpcUrl = "http://127.0.0.1:49332";
 const testUserPrivateKey = "79ccf764755760a2b17c17cd7303ab339bb2fcd38af57219e962d55c10a8fb9f";
 const testUserAccount = new wallet.Account(testUserPrivateKey);
+
+const delay = ms => new Promise(res => setTimeout(res, ms));
 
 async function mainAsync() {
 
@@ -13,7 +16,7 @@ async function mainAsync() {
     const script = Neon.create.script({
         scriptHash: contractScriptHash,
         operation: operation,
-        args: [u.str2hexstring("createSale"), [100, u.str2hexstring("My Best Widget")]] 
+        args: [100, u.str2hexstring("My Best Widget")] 
     });
    
     const config = {
@@ -26,6 +29,15 @@ async function mainAsync() {
      var result = await Neon.doInvoke(config);
      console.log("\n\n--- Response ---");
      console.log(result.response);
+
+     await delay(2000);
+
+     var applog = await rpc.queryRPC(rpcUrl, {
+        method: "getapplicationlog",
+        params: [result.response.txid]
+     });
+     console.log("\n\n--- AppLog ---");
+     console.log(JSON.stringify(applog, null, 4));
  }
 
  mainAsync().catch(err => { console.log(err); });

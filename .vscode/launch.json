@@ -40,7 +40,7 @@
             "request": "launch",
             "preLaunchTask": "build",
             "program": "${workspaceFolder}\\contract\\bin\\Debug\\netstandard2.0\\publish\\Escrow.avm",
-            "checkpoint": "${workspaceFolder}\\checkpoints\\sale-created.neo-express-checkpoint",
+            "checkpoint": "${workspaceFolder}\\checkpoints\\cp4-sale-created.neo-express-checkpoint.neo-express-checkpoint",
             "args": ["getSale", ["0xe564116aab513b66b41c9175390a7e51f64dae9cc0f25349d696137462a2415c"]],
             "storage": [],
             "runtime": {

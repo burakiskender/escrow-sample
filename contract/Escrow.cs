@@ -34,6 +34,9 @@ namespace NGDSeattle
         public delegate void NewSaleDelegate(byte[] txid, byte[] seller, string description, ulong price);
         public static event NewSaleDelegate NewSale;
 
+        public delegate void SaleStateUpdatedDelegate(byte[] txid, byte[] buyer, SaleState state); 
+        public static event SaleStateUpdatedDelegate SaleStateUpdated;
+
         private static readonly byte[] NeoAssetId = Helper.HexToBytes("9b7cffdaa674beae0f930ebe6085af9093e5fe56b34a5c220ccdcf6efc336fc5"); //NEO Asset ID, littleEndian
         private const byte NeoPrecision = 8;
         private const ulong NeoPrecisionDivisior = 100000000;
@@ -54,6 +57,11 @@ namespace NGDSeattle
             if (method == "getSale")
             {
                 return GetSale((byte[])args[0]);
+            }
+
+            if (method == "buyerDeposit")
+            {
+                return BuyerDeposit((byte[])args[0]);
             }
 
             if (method == "migrateContract")
@@ -79,17 +87,8 @@ namespace NGDSeattle
             return false;
         }
 
-
-        private static object CreateSale(ulong price, string description)
+        private static byte[] GetSender(Transaction tx)
         {
-            if (price <= 0)
-            {
-                Error("must set a price > 0");
-                return false;
-            }
-
-            var tx = ExecutionEngine.ScriptContainer as Transaction;
-
             var inputs = tx.GetReferences();
             byte[] sender = null;
             foreach (var input in inputs)
@@ -99,9 +98,14 @@ namespace NGDSeattle
 
                 //Escrow address as inputs is not allowed
                 if (input.ScriptHash.AsBigInteger() == ExecutionEngine.ExecutingScriptHash.AsBigInteger())
-                    return false;
+                    return null;
             }
 
+            return sender;
+        }
+
+        private static ulong GetOutputValue(Transaction tx)
+        {
             var outputs = tx.GetOutputs();
             ulong value = 0;
             foreach (var output in outputs)
@@ -112,16 +116,28 @@ namespace NGDSeattle
                     value += (ulong)output.Value;
                 }
             }
+            return value;
+        }
 
-            if (value % NeoPrecisionDivisior != 0)
+        private static object CreateSale(ulong price, string description)
+        {
+            if (price <= 0)
             {
-                Error("invalid NEO amount");
+                Error("must set a price > 0");
                 return false;
             }
 
-            value = value / NeoPrecisionDivisior;
+            var tx = ExecutionEngine.ScriptContainer as Transaction;
+            var sender = GetSender(tx);
+            if (sender == null)
+            {
+                Error("invalid sender");
+                return false;
+            }
 
-            if (value < price * 2)
+            var value = GetOutputValue(tx);
+
+            if (value < price * NeoPrecisionDivisior * 2)
             {
                 Error("seller deposit must be 2x price", new object[] { value, price });
                 return false;
@@ -143,7 +159,7 @@ namespace NGDSeattle
             return true;
         }
 
-        private static object GetSale(byte[] txid)
+        private static SaleInfo GetSale(byte[] txid)
         {
             if (txid.Length != 32)
                 throw new InvalidOperationException("The parameter txid MUST be 32-byte transaction hash.");
@@ -154,9 +170,38 @@ namespace NGDSeattle
             return Helper.Deserialize(result) as SaleInfo;
         }
 
-        private static object BuyerDeposit(object v)
+        private static object BuyerDeposit(byte[] txid)
         {
-            throw new NotImplementedException();
+            var info = GetSale(txid);
+            if (info.State != SaleState.New)
+            {
+                Error("sale state incorrect", new object[] { info.State });
+                return false;
+            }
+
+            var tx = ExecutionEngine.ScriptContainer as Transaction;
+            var sender = GetSender(tx);
+            if (sender == null)
+            {
+                Error("invalid sender");
+                return false;
+            }
+            var value = GetOutputValue(tx);
+
+            if (value < info.Price * NeoPrecisionDivisior * 2)
+            {
+                Error("buyer deposit must be 2x price", new object[] { value, info });
+                return false;
+            }
+
+            info.Buyer = sender;
+            info.State = SaleState.AwaitingShipment;
+
+            StorageMap saleInfoMap = Storage.CurrentContext.CreateMap(nameof(Escrow));
+            saleInfoMap.Put(info.Id, Helper.Serialize(info));
+
+            SaleStateUpdated(info.Id, info.Buyer, info.State);
+            return true;
         }
 
         private static object ConfirmShipment(object v)

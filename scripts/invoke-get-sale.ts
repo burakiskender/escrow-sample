@@ -5,7 +5,7 @@ const rpcUrl = "http://127.0.0.1:49332";
 
 const param1 = Neon.create.contractParam("String", "getSale");
 const param2 = sc.ContractParam.byteArray(
-    u.reverseHex("e564116aab513b66b41c9175390a7e51f64dae9cc0f25349d696137462a2415c"), 
+    u.reverseHex('da6b28532f8d4811aa675d26dec041f6c21166c63c9c49964009236941f43721'), 
     null);
 
 async function mainAsync() {

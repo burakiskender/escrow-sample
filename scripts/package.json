@@ -6,7 +6,8 @@
   "scripts": {
     "update": "ts-node update-contract-hash.ts",
     "createSale": "ts-node invoke-create-sale.ts",
-    "getSale": "ts-node invoke-get-sale.ts"
+    "getSale": "ts-node invoke-get-sale.ts",
+    "buyerDeposit": "ts-node invoke-buyer-deposit.ts"
   },
   "author": "",
   "license": "ISC",

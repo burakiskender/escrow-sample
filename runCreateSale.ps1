@@ -7,3 +7,4 @@ start-sleep -Seconds 2
 neo-express checkpoint create checkpoints\cp3-contract-deployed.neo-express-checkpoint --force --online 
 npm run createSale --prefix=.\scripts\
 neo-express checkpoint create checkpoints\cp4-sale-created.neo-express-checkpoint --force --online
+

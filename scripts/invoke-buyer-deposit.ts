@@ -3,14 +3,14 @@ import { getContractHash } from './get-contract-hash'
 import { getPrivateKey } from './get-express-info'
 import { rpc } from "@cityofzion/neon-core";
 
-const operation = "createSale"
+const operation = "buyerDeposit"
 const rpcUrl = "http://127.0.0.1:49332";
 
 const delay = ms => new Promise(res => setTimeout(res, ms));
 
 async function mainAsync() {
 
-    const testUserPrivateKey = await getPrivateKey("seller"); 
+    const testUserPrivateKey = await getPrivateKey("buyer"); 
     const testUserAccount = new wallet.Account(testUserPrivateKey);
 
     const contractScriptHash = await getContractHash();
@@ -18,7 +18,7 @@ async function mainAsync() {
     const script = Neon.create.script({
         scriptHash: contractScriptHash,
         operation: operation,
-        args: [100, u.str2hexstring("My Best Widget")] 
+        args: [u.reverseHex('da6b28532f8d4811aa675d26dec041f6c21166c63c9c49964009236941f43721'),] 
     });
    
     const config = {

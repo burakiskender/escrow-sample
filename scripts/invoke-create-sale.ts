@@ -1,11 +1,5 @@
 import Neon, { api, wallet, u } from "@cityofzion/neon-js";
-import * as path from "path";
-import * as fs from "fs";
-import { promisify } from "util";
-
-const readFile = promisify(fs.readFile);
-const rootPath = path.resolve(__dirname, '..');
-const abiPath = path.join(rootPath, 'contract\\bin\\Debug\\netstandard2.0\\publish\\Escrow.abi.json');
+import { getContractHash } from './get-contract-hash'
 
 const operation = "createSale"
 const rpcUrl = "http://127.0.0.1:49332";
@@ -14,7 +8,7 @@ const testUserAccount = new wallet.Account(testUserPrivateKey);
 
 async function mainAsync() {
 
-    const contractScriptHash = JSON.parse(await readFile(abiPath, "utf8")).hash.substring(2);
+    const contractScriptHash = await getContractHash();
 
     const script = Neon.create.script({
         scriptHash: contractScriptHash,
@@ -26,7 +20,7 @@ async function mainAsync() {
         api: new api.neoCli.instance(rpcUrl),
         account: testUserAccount,
         script: script,
-        intents: api.makeIntent({ NEO: 100 }, contractScriptHash)
+        intents: api.makeIntent({ NEO: 200 }, contractScriptHash)
      };
 
      var result = await Neon.doInvoke(config);

@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "update": "ts-node update-contract-hash.ts",
-    "createSale": "ts-node invoke-create-sale.ts"
+    "createSale": "ts-node invoke-create-sale.ts",
+    "getSale": "ts-node invoke-get-sale.ts"
   },
   "author": "",
   "license": "ISC",

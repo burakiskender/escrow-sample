@@ -10,13 +10,13 @@
             "request": "launch",
             "preLaunchTask": "build",
             "program": "${workspaceFolder}\\contract\\bin\\Debug\\netstandard2.0\\publish\\Escrow.avm",
-            "checkpoint": "${workspaceFolder}\\checkpoints\\cp1.neo-express-checkpoint",
+            "checkpoint": "${workspaceFolder}\\checkpoints\\cp2-seller-and-buyer.neo-express-checkpoint",
             "args": ["createSale", [100, "fake sale"]],
             "storage": [],
             "utxo": {
                 "inputs": [
                     {
-                        "txid": "89e1914bab8c6f65f03911ab1375a8c12101adbf72ce12f728d8b8097807cab1",
+                        "txid": "21cda920a1d53c17023cfeda780c3902f611e352937c3c015b44ad3be5539ff7",
                         "n": 1
                     }
                 ],
@@ -24,7 +24,7 @@
                     {
                         "asset": "neo",
                         "value": 200,
-                        "address": "f7696fae06f95959dc838e6749f6e0cc868dfdef"
+                        "address": "56110375f6f72dbb52fef2350a3bb1b987f370f0"
                     }
                 ]
             },

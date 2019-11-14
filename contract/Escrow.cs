@@ -34,13 +34,23 @@ namespace NGDSeattle
         public delegate void NewSaleDelegate(byte[] txid, byte[] seller, string description, ulong price);
         public static event NewSaleDelegate NewSale;
 
-        public delegate void SaleStateUpdatedDelegate(byte[] txid, byte[] buyer, SaleState state); 
+        public delegate void SaleStateUpdatedDelegate(byte[] txid, byte[] buyer, SaleState state);
         public static event SaleStateUpdatedDelegate SaleStateUpdated;
+
+        public delegate void SaleCompletedDelegate(byte[] txid);
+        public static event SaleCompletedDelegate SaleCompleted;
+
+        public delegate void FundsTransferredDelegate(byte[] accountId, BigInteger value);
+        public static event FundsTransferredDelegate FundsTransferred;
+
+
 
         private static readonly byte[] NeoAssetId = Helper.HexToBytes("9b7cffdaa674beae0f930ebe6085af9093e5fe56b34a5c220ccdcf6efc336fc5"); //NEO Asset ID, littleEndian
         private const byte NeoPrecision = 8;
         private const ulong NeoPrecisionDivisior = 100000000;
 
+        const string SalesMapName = nameof(Escrow);
+        const string FundsMapName = nameof(Escrow) + "Funds";
 
         public static object Main(string method, object[] args)
         {
@@ -64,8 +74,19 @@ namespace NGDSeattle
                 return BuyerDeposit((byte[])args[0]);
             }
 
-            if (method == "confirmShipment") {
+            if (method == "confirmShipment")
+            {
                 return ConfirmShipment((byte[])args[0]);
+            }
+
+            if (method == "confirmReceived")
+            {
+                return ConfirmReceived((byte[])args[0]);
+            }
+
+            if (method == "getBalance") 
+            {
+                return GetBalance((byte[])args[0]); 
             }
 
             if (method == "migrateContract")
@@ -141,7 +162,7 @@ namespace NGDSeattle
 
             var value = GetOutputValue(tx);
 
-            if (value < price * NeoPrecisionDivisior * 2)
+            if (value != price * NeoPrecisionDivisior * 2)
             {
                 Error("seller deposit must be 2x price", new object[] { value, price });
                 return false;
@@ -156,7 +177,7 @@ namespace NGDSeattle
                 State = SaleState.New
             };
 
-            StorageMap saleInfo = Storage.CurrentContext.CreateMap(nameof(Escrow));
+            StorageMap saleInfo = Storage.CurrentContext.CreateMap(SalesMapName);
             saleInfo.Put(info.Id, Helper.Serialize(info));
 
             NewSale(info.Id, info.Seller, info.Description, info.Price);
@@ -168,7 +189,7 @@ namespace NGDSeattle
             if (txid.Length != 32)
                 throw new InvalidOperationException("The parameter txid MUST be 32-byte transaction hash.");
 
-            StorageMap saleInfo = Storage.CurrentContext.CreateMap(nameof(Escrow));
+            StorageMap saleInfo = Storage.CurrentContext.CreateMap(SalesMapName);
             var result = saleInfo.Get(txid);
             if (result.Length == 0) return null;
             return Helper.Deserialize(result) as SaleInfo;
@@ -192,7 +213,7 @@ namespace NGDSeattle
             }
             var value = GetOutputValue(tx);
 
-            if (value < info.Price * NeoPrecisionDivisior * 2)
+            if (value != info.Price * NeoPrecisionDivisior * 2)
             {
                 Error("buyer deposit must be 2x price", new object[] { value, info });
                 return false;
@@ -201,7 +222,7 @@ namespace NGDSeattle
             info.Buyer = sender;
             info.State = SaleState.AwaitingShipment;
 
-            StorageMap saleInfoMap = Storage.CurrentContext.CreateMap(nameof(Escrow));
+            StorageMap saleInfoMap = Storage.CurrentContext.CreateMap(SalesMapName);
             saleInfoMap.Put(info.Id, Helper.Serialize(info));
 
             SaleStateUpdated(info.Id, info.Buyer, info.State);
@@ -231,7 +252,7 @@ namespace NGDSeattle
 
             info.State = SaleState.ShipmentConfirmed;
 
-            StorageMap saleInfoMap = Storage.CurrentContext.CreateMap(nameof(Escrow));
+            StorageMap saleInfoMap = Storage.CurrentContext.CreateMap(SalesMapName);
             saleInfoMap.Put(info.Id, Helper.Serialize(info));
 
             SaleStateUpdated(info.Id, null, info.State);
@@ -240,12 +261,43 @@ namespace NGDSeattle
 
         public static bool ConfirmReceived(byte[] txid)
         {
-            throw new NotImplementedException();
+            var info = GetSale(txid);
+            if (info.State != SaleState.ShipmentConfirmed)
+            {
+                Error("sale state incorrect", new object[] { info.State });
+                return false;
+            }
+
+            if (!Runtime.CheckWitness(info.Buyer))
+            {
+                Error("must be buyer to confirm shipment", new object[] { info.Buyer });
+                return false;
+            }
+
+            var price = info.Price * NeoPrecisionDivisior;
+
+            StorageMap fundsMap = Storage.CurrentContext.CreateMap(FundsMapName);
+            var sellerAmount = fundsMap.Get(info.Seller).AsBigInteger();
+            fundsMap.Put(info.Seller, sellerAmount + price * 3);
+            var buyerAmount = fundsMap.Get(info.Buyer).AsBigInteger();
+            fundsMap.Put(info.Buyer, buyerAmount + price);
+
+            StorageMap saleInfoMap = Storage.CurrentContext.CreateMap(SalesMapName);
+            saleInfoMap.Delete(info.Id);
+
+            SaleCompleted(info.Id);
+            FundsTransferred(info.Seller, info.Price * 3);
+            FundsTransferred(info.Buyer, info.Price);
+
+            return true;
         }
 
-        public static bool DeleteSale(byte[] txid)
+        public static BigInteger GetBalance(byte[] account)
         {
-            throw new NotImplementedException();
+            if (account.Length != 20)
+                throw new InvalidOperationException("The parameter account SHOULD be 20-byte addresses.");
+            StorageMap fundsMap = Storage.CurrentContext.CreateMap(FundsMapName);
+            return fundsMap.Get(account).AsBigInteger();
         }
     }
 }

@@ -8,7 +8,9 @@
     "createSale": "ts-node invoke-create-sale.ts",
     "getSale": "ts-node invoke-get-sale.ts",
     "buyerDeposit": "ts-node invoke-buyer-deposit.ts",
-    "shipConfirm": "ts-node invoke-confirm-shipment.ts"
+    "shipConfirm": "ts-node invoke-confirm-shipment.ts",
+    "receiveConfirm": "ts-node invoke-confirm-received.ts",
+    "getBalance": "ts-node invoke-get-balance.ts"
   },
   "author": "",
   "license": "ISC",

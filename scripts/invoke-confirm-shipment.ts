@@ -2,8 +2,9 @@ import Neon, { api, wallet, u, sc } from "@cityofzion/neon-js";
 import { getContractHash } from './get-contract-hash'
 import { getPrivateKey } from './get-express-info'
 import { rpc } from "@cityofzion/neon-core";
+import { getTxInfo } from "./tx-info";
 
-const operation = "confirm"
+const operation = "confirmShipment"
 const rpcUrl = "http://127.0.0.1:49332";
 
 const delay = ms => new Promise(res => setTimeout(res, ms));
@@ -14,11 +15,12 @@ async function mainAsync() {
     const sellerAccount = new wallet.Account(sellerPrivateKey);
 
     const contractScriptHash = await getContractHash();
+    let txInfo = await getTxInfo();
 
     const script = Neon.create.script({
         scriptHash: contractScriptHash,
         operation: operation,
-        args: [u.reverseHex('da6b28532f8d4811aa675d26dec041f6c21166c63c9c49964009236941f43721'),] 
+        args: [u.reverseHex(txInfo.createSaleTx),] 
     });
    
     const config = {

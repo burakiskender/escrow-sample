@@ -6,9 +6,13 @@ using System.Numerics;
 
 using Helper = Neo.SmartContract.Framework.Helper;
 
+// Note, this contract is a port of safe-remote-purchase.py 
+//       originally written by Joe Stewart (aka hal0x2328)
+//       https://github.com/Splyse/MCT/blob/master/safe-remote-purchase.py
+// Ported from python to C# by Harry Pierson (aka DevHawk)
+
 namespace NGDSeattle
 {
-
     public enum SaleState
     {
         New,

@@ -64,6 +64,10 @@ namespace NGDSeattle
                 return BuyerDeposit((byte[])args[0]);
             }
 
+            if (method == "confirmShipment") {
+                return ConfirmShipment((byte[])args[0]);
+            }
+
             if (method == "migrateContract")
             {
                 if (args.Length != 10)
@@ -119,7 +123,7 @@ namespace NGDSeattle
             return value;
         }
 
-        private static object CreateSale(ulong price, string description)
+        public static object CreateSale(ulong price, string description)
         {
             if (price <= 0)
             {
@@ -159,7 +163,7 @@ namespace NGDSeattle
             return true;
         }
 
-        private static SaleInfo GetSale(byte[] txid)
+        public static SaleInfo GetSale(byte[] txid)
         {
             if (txid.Length != 32)
                 throw new InvalidOperationException("The parameter txid MUST be 32-byte transaction hash.");
@@ -170,7 +174,7 @@ namespace NGDSeattle
             return Helper.Deserialize(result) as SaleInfo;
         }
 
-        private static object BuyerDeposit(byte[] txid)
+        public static object BuyerDeposit(byte[] txid)
         {
             var info = GetSale(txid);
             if (info.State != SaleState.New)
@@ -204,17 +208,42 @@ namespace NGDSeattle
             return true;
         }
 
-        private static object ConfirmShipment(object v)
+        public static bool ConfirmShipment(byte[] txid)
+        {
+            var info = GetSale(txid);
+            if (info.State != SaleState.AwaitingShipment)
+            {
+                Error("sale state incorrect", new object[] { info.State });
+                return false;
+            }
+
+            if (info.Buyer == null)
+            {
+                Error("buyer not specified");
+                return false;
+            }
+
+            if (!Runtime.CheckWitness(info.Seller))
+            {
+                Error("must be seller to confirm shipment", new object[] { info.Seller });
+                return false;
+            }
+
+            info.State = SaleState.ShipmentConfirmed;
+
+            StorageMap saleInfoMap = Storage.CurrentContext.CreateMap(nameof(Escrow));
+            saleInfoMap.Put(info.Id, Helper.Serialize(info));
+
+            SaleStateUpdated(info.Id, null, info.State);
+            return true;
+        }
+
+        public static bool ConfirmReceived(byte[] txid)
         {
             throw new NotImplementedException();
         }
 
-        private static object ConfirmReceived(object v)
-        {
-            throw new NotImplementedException();
-        }
-
-        private static object DeleteSale(object v)
+        public static bool DeleteSale(byte[] txid)
         {
             throw new NotImplementedException();
         }

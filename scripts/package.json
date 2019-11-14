@@ -7,7 +7,8 @@
     "update": "ts-node update-contract-hash.ts",
     "createSale": "ts-node invoke-create-sale.ts",
     "getSale": "ts-node invoke-get-sale.ts",
-    "buyerDeposit": "ts-node invoke-buyer-deposit.ts"
+    "buyerDeposit": "ts-node invoke-buyer-deposit.ts",
+    "shipConfirm": "ts-node invoke-confirm-shipment.ts"
   },
   "author": "",
   "license": "ISC",

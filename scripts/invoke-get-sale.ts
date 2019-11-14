@@ -1,16 +1,19 @@
 import Neon, { api, wallet, u, rpc, sc } from "@cityofzion/neon-js";
 import { getContractHash } from './get-contract-hash'
+import { getTxInfo } from "./tx-info";
 
 const rpcUrl = "http://127.0.0.1:49332";
 
 const param1 = Neon.create.contractParam("String", "getSale");
-const param2 = sc.ContractParam.byteArray(
-    u.reverseHex('da6b28532f8d4811aa675d26dec041f6c21166c63c9c49964009236941f43721'), 
-    null);
 
 async function mainAsync() {
     const contractHash = await getContractHash();
-
+    let txInfo = await getTxInfo();
+    
+    const param2 = sc.ContractParam.byteArray(
+        u.reverseHex(txInfo.createSaleTx), 
+        null);
+    
     var client = new rpc.RPCClient(rpcUrl);
     var result = await client.invoke(
         contractHash, 

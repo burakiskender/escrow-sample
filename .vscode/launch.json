@@ -11,7 +11,7 @@
             "preLaunchTask": "build",
             "program": "${workspaceFolder}\\contract\\bin\\Debug\\netstandard2.0\\publish\\Escrow.avm",
             "checkpoint": "${workspaceFolder}\\checkpoints\\cp2-seller-and-buyer.neo-express-checkpoint",
-            "args": ["createSale", [100, "fake sale"]],
+            "args": ["createSale", [100, "a cool widget"]],
             "storage": [],
             "utxo": {
                 "inputs": [
@@ -24,7 +24,7 @@
                     {
                         "asset": "neo",
                         "value": 200,
-                        "address": "56110375f6f72dbb52fef2350a3bb1b987f370f0"
+                        "address": "d97808b8f1cea838fdfe9ec0cf06f7912cbc2cbe"
                     }
                 ]
             },
@@ -40,14 +40,103 @@
             "request": "launch",
             "preLaunchTask": "build",
             "program": "${workspaceFolder}\\contract\\bin\\Debug\\netstandard2.0\\publish\\Escrow.avm",
-            "checkpoint": "${workspaceFolder}\\checkpoints\\cp4-sale-created.neo-express-checkpoint.neo-express-checkpoint",
-            "args": ["getSale", ["0xe564116aab513b66b41c9175390a7e51f64dae9cc0f25349d696137462a2415c"]],
+            "checkpoint": "${workspaceFolder}\\checkpoints\\cp4-sale-created.neo-express-checkpoint",
+            "args": ["getSale", ["0x32f59c346d5dc143b6632bb7a3f5982b769faa1a7c061f242585fc385e68a3b5"]],
             "storage": [],
             "runtime": {
                 "witnesses": {
                     "check-result": true
                 }
             }
-        }
+        },
+        {
+            "name": "buyerDeposit",
+            "type": "neo-contract",
+            "request": "launch",
+            "preLaunchTask": "build",
+            "program": "${workspaceFolder}\\contract\\bin\\Debug\\netstandard2.0\\publish\\Escrow.avm",
+            "checkpoint": "${workspaceFolder}\\checkpoints\\cp4-sale-created.neo-express-checkpoint",
+            "args": ["buyerDeposit", ["0x32f59c346d5dc143b6632bb7a3f5982b769faa1a7c061f242585fc385e68a3b5"]],
+            "utxo": {
+                "inputs": [
+                    {
+                        "txid": "702d314f42e7a7f369846588929c80aa6f051e8b859a479f117a607010ed5f0b",
+                        "n": 1
+                    }
+                ],
+                "outputs": [
+                    {
+                        "asset": "neo",
+                        "value": 200,
+                        "address": "d97808b8f1cea838fdfe9ec0cf06f7912cbc2cbe"
+                    }
+                ]
+            },            "storage": [],
+            "runtime": {
+                "witnesses": {
+                    "check-result": true
+                }
+            }
+        },
+        {
+            "name": "confirmShipment",
+            "type": "neo-contract",
+            "request": "launch",
+            "preLaunchTask": "build",
+            "program": "${workspaceFolder}\\contract\\bin\\Debug\\netstandard2.0\\publish\\Escrow.avm",
+            "checkpoint": "${workspaceFolder}\\checkpoints\\cp5-buyer-deposit.neo-express-checkpoint",
+            "args": ["confirmShipment", ["0x32f59c346d5dc143b6632bb7a3f5982b769faa1a7c061f242585fc385e68a3b5"]],
+            "storage": [],
+            "runtime": {
+                "witnesses": {
+                    "check-result": true
+                }
+            }
+        },
+        {
+            "name": "confirmReceived",
+            "type": "neo-contract",
+            "request": "launch",
+            "preLaunchTask": "build",
+            "program": "${workspaceFolder}\\contract\\bin\\Debug\\netstandard2.0\\publish\\Escrow.avm",
+            "checkpoint": "${workspaceFolder}\\checkpoints\\cp6-ship-confirm.neo-express-checkpoint",
+            "args": ["confirmReceived", ["0x32f59c346d5dc143b6632bb7a3f5982b769faa1a7c061f242585fc385e68a3b5"]],
+            "storage": [],
+            "runtime": {
+                "witnesses": {
+                    "check-result": true
+                }
+            }
+        },
+        {
+            "name": "getBalance (seller)",
+            "type": "neo-contract",
+            "request": "launch",
+            "preLaunchTask": "build",
+            "program": "${workspaceFolder}\\contract\\bin\\Debug\\netstandard2.0\\publish\\Escrow.avm",
+            "checkpoint": "${workspaceFolder}\\checkpoints\\cp7-receive-confirm.neo-express-checkpoint",
+            "args": ["getBalance", ["@ARZJ7NeUPLZqvStSrAXkrkWA68tPCpsM81"]],
+            "storage": [],
+            "runtime": {
+                "witnesses": {
+                    "check-result": true
+                }
+            }
+        },
+        {
+            "name": "getBalance (buyer)",
+            "type": "neo-contract",
+            "request": "launch",
+            "preLaunchTask": "build",
+            "program": "${workspaceFolder}\\contract\\bin\\Debug\\netstandard2.0\\publish\\Escrow.avm",
+            "checkpoint": "${workspaceFolder}\\checkpoints\\cp7-receive-confirm.neo-express-checkpoint",
+            "args": ["getBalance", ["@AWyd4a53bWpjNsD65wAREqymkRnypnPv7j"]],
+            "storage": [],
+            "runtime": {
+                "witnesses": {
+                    "check-result": true
+                }
+            }
+        },
     ]
 }

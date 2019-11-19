@@ -4,8 +4,14 @@
         Mandatory=$true, 
         ValueFromPipeline=$true)
 	]	
-	[string]$s, 
-	[switch]$reverse)
+	[string]$s)
+
+	if ($s.StartsWith("0x")) {
+		$s = $s.Substring(2)
+	}
+	if ($s.Length % 2 -eq 1) {
+		$s = "0" + $s;
+	}
 
 	$return = @()
 	
@@ -14,9 +20,7 @@
 	$return += [Byte]::Parse($s.Substring($i, 2), [System.Globalization.NumberStyles]::HexNumber)
 	}
 	
-	if ($reverse) {
-		[Array]::Reverse($return)
-	}
-
+	[Array]::Reverse($return)
 	$v = [System.Numerics.BigInteger]::new([byte[]]$return);
+	$v = $v / 100000000
 	$v.ToString()
